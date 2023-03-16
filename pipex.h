@@ -7,7 +7,8 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 
-void	test(int argc, char *argv[], int *fd);
-void	exec(char *command, char **envp, int *num, int *fd);
+void	test(int argc);
+void	exec(char *command, char **envp, int *num, int **fd);
+int	open_files(char *argv[], int argc, int *fd);
 
 #endif

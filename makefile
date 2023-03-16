@@ -10,13 +10,13 @@ NAME		= pipex
 
 CC			= gcc
 
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -g -Wall -Wextra -Werror
 
 .c.o:		
 			${CC} ${CFLAGS} -I${HEAD} -Ilibft -c $< -o ${<:.c=.o}
 
 ${NAME}:	${LFT} ${OBJS}
-			${CC} ${OBJS} -L ./libft -lft -o ${NAME}
+			${CC} ${CFLAGS} ${OBJS} -L ./libft -lft -o ${NAME}
 
 ${LFT}:
 			make -s -C libft
