@@ -9,6 +9,7 @@
 
 void	test(int argc);
 void	exec(char *command, char **envp, int *num, int **fd);
-int	open_files(char *argv[], int argc, int *fd);
+int		open_files(char *argv[], int argc, int *fd);
+char	*test_command(char *command);
 
 #endif

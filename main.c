@@ -5,6 +5,7 @@ void	ft_number(int i, int ncmd, int *fd, int *ret)
 	ret[1] = fd[0];
 	ret[2] = fd[1];
 	ret[3] = i;
+	ret[4] = ncmd - 1;
 	if (i == 0 && i != ncmd)
 		ret[0] = 1;
 	else if (i != 0 && i == ncmd - 1)
@@ -20,15 +21,12 @@ int	open_files(char *argv[], int argc, int *fd)
 	fd[1] = open(argv[argc - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd[1] == -1)
 	{
-		perror("open");
+		perror("pipex: output");
 		exit(1);
 	}
 	fd[0] = open(argv[1], O_RDONLY, 0);
 	if (fd[0] == -1)
-	{
-		perror("open");
-		exit(0);
-	}
+		perror("pipex: input");
 	return (1);
 }
 
@@ -40,7 +38,7 @@ int	main(int argc, char *argv[], char **envp)
 	pid_t	*pid;
 	int		**pipes;
 	int		fd[2];
-	int		ret[4];
+	int		ret[5];
 
 	i = 0;
 	test(argc);

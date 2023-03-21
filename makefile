@@ -23,6 +23,8 @@ ${LFT}:
 
 all:		${NAME}
 
+bonus:		all
+
 clean:
 			${RM} ${OBJS} ${OBJS_BONUS}
 			make clean -C libft
