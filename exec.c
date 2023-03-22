@@ -1,15 +1,5 @@
 #include "pipex.h"
 
-void	print_file(int fd)
-{
-	char	buf[1000];
-
-	if(read(fd, buf, 999) == -1)
-		write(2, "error\n", 8);
-	write(2, buf, 999);
-}
-
-
 int	permission_denied(char *command)
 {
 	char	*error[2];
@@ -34,34 +24,44 @@ int	command_not_found(char *command)
 	exit(127);
 }
 
-char *find_path(char *command, char **envp)
+char *find_env_path(char **envp)
 {
 	char	*envp_path;
-	char	**paths;
-	char	*cmd_path;
-	char	*cmd;
 
 	envp_path = NULL;
-	if (!access(command, F_OK))
-		return (command);
 	while (*envp && !envp_path)
 	{
 		if (ft_strnstr(*envp, "PATH", 4))
 			envp_path = ft_substr(*envp, 5, ft_strlen(*envp)- 5);
 		envp++;
 	}
+	return (envp_path);
+}
+
+char *find_path(char *command, char *envp_path)
+{
+	char	**paths;
+	char	*cmd_path;
+	char	*cmd;
+	int		i;
+
+	//if (!envp_path/* && !access(command, F_OK))
+	//	return (command);
 	paths = ft_split(envp_path, ':');
 	cmd = ft_strjoin("/", command);
-	while (*paths)
+	i = 0;
+	while (paths[i])
 	{
-		cmd_path = ft_strjoin(*paths, cmd);
+		cmd_path = ft_strjoin(paths[i], cmd);
 		if (!access(cmd_path, F_OK))
-			break ;
-		paths++;
+			return (free(cmd), cmd_path);
+		i++;
 		free(cmd_path);
 	}
 	free(cmd);
-	return (cmd_path);
+	if (!access(command, F_OK))
+		return (command);
+	return (NULL);
 }
 
 int	test_quote(char *command)
@@ -199,8 +199,12 @@ char	**split_command(char *command)
 				c = ret[i];
 				ret[i] = ft_strjoin(ret[i], ret[i + y]);
 				free(c);
-				ret[i] = ret[i] + 1;
-				ret[i][ft_strlen(ret[i]) - 1] = 0;
+				c = ret[i];
+				if (r == 34)
+					ret[i] = ft_strtrim(ret[i], "\"");
+				else if (r == 39)
+					ret[i] = ft_strtrim(ret[i], "\'");
+				free(c);
 				ret[i] = test_ech(ret[i]);
 				while (ret[++i])
 					ret[i] = ret[i + y];
@@ -232,6 +236,23 @@ int	close_all(int in, int out, int **pipes, int size)
 	return (1);
 }
 
+char	*ft_path(char **args, char **envp)
+{
+	char	*path;
+	char	*envp_path;
+
+	envp_path = find_env_path(envp);
+	if (envp_path)
+		path = find_path(args[0], envp_path);
+	else
+		path = args[0];
+	if (!access(path, F_OK) && access(path, X_OK))
+		permission_denied(args[0]);
+	else if (access(path, X_OK))
+		command_not_found(args[0]);
+	return (path);
+}
+
 void	exec(char *command, char **envp, int *num, int **fd)
 {
 	char	*path;
@@ -245,11 +266,7 @@ void	exec(char *command, char **envp, int *num, int **fd)
 		printf("%s\n", *test);
 		test++;
 	}*/
-	path = find_path(args[0], envp);
-	if (!access(path, F_OK) && access(path, X_OK))
-		permission_denied(command);
-	else if (access(path, X_OK))
-		command_not_found(command);
+	path = ft_path(args, envp);
 	if (num[0] == 1)
 	{
 		close_all(-1, num[3], fd, num[4]);
