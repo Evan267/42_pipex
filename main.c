@@ -18,55 +18,28 @@ void	ft_number(int i, int ncmd, int *fd, int *ret)
 
 int	open_files(char *argv[], int argc, int *fd)
 {
-	fd[1] = open(argv[argc - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (fd[0] == -2)
+		fd[1] = open(argv[argc - 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	else
+		fd[1] = open(argv[argc - 1], O_CREAT | O_WRONLY | O_APPEND, 0644);
 	if (fd[1] == -1)
 	{
 		perror("pipex: output");
 		exit(1);
 	}
-	fd[0] = open(argv[1], O_RDONLY, 0);
-	if (fd[0] == -1)
-		perror("pipex: input");
-	return (1);
-}
-
-int	here_doc(/*int *pipes*/)
-{
-	int	i;
-	pid_t	pid;
-	char	*c;
-	int		status;
-	int octet;
-
-	i = 0;
-	c = malloc(10);
-	c[9] = 0;
-	pid = fork();
-	if (pid == -1)
+	if  (fd[0] == -2)
 	{
-		perror("pipe");
-		exit(127);
+		fd[0] = open(argv[1], O_RDONLY, 0);
+		if (fd[0] == -1)
+			perror("pipex: input");
 	}
-	else if (pid == 0)
-	{
-		//if (dup2(pipes[0], STDIN_FILENO) == -1)
-		//	exit(0);
-		octet = read(0, c, 9);
-		printf("%s\n", c);
-		/*while (1)
-		{
-			if (*c)
-				printf("%s\n", c);
-			octet = read(0, c, 9);
-		}*/
-	}
-	wait(&status);
 	return (1);
 }
 
 int	main(int argc, char *argv[], char **envp)
 {
 	int		i;
+	int		y;
 	int		status;
 	int		ncom;
 	pid_t	*pid;
@@ -75,14 +48,17 @@ int	main(int argc, char *argv[], char **envp)
 	int		ret[5];
 
 	i = 0;
-	//unsetenv("PATH");
 	test(argc);
+	fd[0] = -2;
 	if (!ft_strncmp(argv[1], "here_doc", ft_strlen(argv[1])))
+	{
 		ncom = argc - 4;
+		y = 3;
+	}
 	else
 	{
-		open_files(argv, argc, fd);
 		ncom = argc - 3;
+		y = 2;
 	}
 	pipes = malloc(sizeof(int *) * ncom - 1);
 	while (i < ncom - 1)
@@ -91,10 +67,9 @@ int	main(int argc, char *argv[], char **envp)
 		i++;
 	}
 	pid = malloc(sizeof(pid_t) * ncom);
-
 	if (ncom == argc - 4)
-		here_doc(/*pipes[0]*/);
-
+		fd[0] = here_doc(argv[2]);
+	open_files(argv, argc, fd);
 	i = 0;
 	while (i < ncom - 1)
 	{
@@ -115,7 +90,7 @@ int	main(int argc, char *argv[], char **envp)
 		}
 		else if (pid[i] == 0) {
 			ft_number(i, ncom, fd, ret);
-			exec(argv[i + 2], envp, ret, pipes);
+			exec(argv[i + y], envp, ret, pipes);
 		}
 		i++;
 	}
