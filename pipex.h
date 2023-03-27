@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 11:30:47 by eberger           #+#    #+#             */
-/*   Updated: 2023/03/24 13:02:59 by eberger          ###   ########.fr       */
+/*   Updated: 2023/03/27 17:11:18 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,23 +21,27 @@
 # include <fcntl.h>
 
 void	exec(char *command, char **envp, int *num, int **fd);
-int		open_files(char *argv[], int argc, int *fd);
+int		open_files(char *argv[], int argc, int *num);
 char	*test_command(char *command);
 
 int		command_not_found(char *command);
 int		permission_denied(char *command);
+int		close_all(int in, int out, int **pipes, int size);
 
-void	test(int argc);
+void	test(int argc, int *ret, char **argv);
 int		test_quote(char *command);
 char	**test_space(char **ret);
 char	*test_ech(char *command);
 char	*test_sh(char *command);
 
 char	*find_env_path(char **envp);
-char 	*find_path(char *command, char *envp_path);
+char	*find_path(char *command, char *envp_path);
 char	*find_notenv(char *command);
 char	*ft_path(char **args, char **envp);
 
-int	here_doc(/*int *pipes*/);
+int		here_doc(char *limiter);
+
+char	*join_3_str(char *str1, char *str2, char *str3);
+void	trim_by_char(char **ret, char c);
 
 #endif

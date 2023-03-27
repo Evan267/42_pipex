@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   path.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/27 11:19:00 by eberger           #+#    #+#             */
+/*   Updated: 2023/03/27 15:03:55 by eberger          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-char *find_env_path(char **envp)
+char	*find_env_path(char **envp)
 {
 	char	*envp_path;
 
@@ -8,13 +20,13 @@ char *find_env_path(char **envp)
 	while (*envp && !envp_path)
 	{
 		if (ft_strnstr(*envp, "PATH", 4))
-			envp_path = ft_substr(*envp, 5, ft_strlen(*envp)- 5);
+			envp_path = ft_substr(*envp, 5, ft_strlen(*envp) - 5);
 		envp++;
 	}
 	return (envp_path);
 }
 
-char *find_path(char *command, char *envp_path)
+char	*find_path(char *command, char *envp_path)
 {
 	char	**paths;
 	char	*cmd_path;
@@ -38,36 +50,44 @@ char *find_path(char *command, char *envp_path)
 	return (NULL);
 }
 
-char	*find_notenv(char *command)
+void	fork_whereis(int *pipes, char **args)
 {
-	int		pipes[2];
 	pid_t	pid;
-	char	*args[3];
 	int		status;
-	char	*path;
-	char	*ret;
 
-	args[0] = ft_strdup("whereis");	
-	args[1] = command;
-	args[2] = NULL;
-	if (pipe(pipes) == -1) 
-	{	
-		perror("pipe");
-		exit(127);
-	}
 	pid = fork();
-	if (pid == -1) {
+	if (pid == -1)
+	{
 		perror("fork");
 		exit(127);
 	}
-	else if (pid == 0) {
+	else if (pid == 0)
+	{
 		close(pipes[0]);
-		if(dup2(pipes[1], STDOUT_FILENO) == -1)
+		if (dup2(pipes[1], STDOUT_FILENO) == -1)
 			exit(0);
 		execve("/usr/bin/whereis", args, NULL);
 	}
 	pid = waitpid(pid, &status, 0);
 	close(pipes[1]);
+}
+
+char	*find_notenv(char *command)
+{
+	int		pipes[2];
+	char	*args[3];
+	char	*path;
+	char	*ret;
+
+	args[0] = ft_strdup("whereis");
+	args[1] = command;
+	args[2] = NULL;
+	if (pipe(pipes) == -1)
+	{	
+		perror("pipe");
+		exit(127);
+	}
+	fork_whereis(pipes, args);
 	path = get_next_line(pipes[0]);
 	if (path)
 	{
@@ -84,7 +104,6 @@ char	*ft_path(char **args, char **envp)
 {
 	char	*path;
 	char	*envp_path;
-
 
 	envp_path = find_env_path(envp);
 	if (envp_path)

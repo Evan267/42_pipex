@@ -6,71 +6,60 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 16:31:38 by eberger           #+#    #+#             */
-/*   Updated: 2023/03/24 16:46:40 by eberger          ###   ########.fr       */
+/*   Updated: 2023/03/27 14:38:41 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+void	split_quote(int *i, char **ret, char *c_ret)
+{
+	char	trim[2];
+
+	trim[0] = i[2];
+	trim[1] = 0;
+	if (c_ret && (!ft_strchr(c_ret + 1, i[2])
+			|| *(ft_strchr(c_ret + 1, i[2]) - 1) == '\\'))
+	{
+		i[1]++;
+		while (!ft_strchr(ret[i[0] + i[1]], i[2])
+			|| *(ft_strchr(ret[i[0] + i[1]], i[2]) - 1) == '\\')
+		{
+			ret[i[0]] = join_3_str(ret[i[0]], " ", ret[i[0] + i[1]]);
+			i[1]++;
+		}
+		ret[i[0]] = join_3_str(ret[i[0]], " ", ret[i[0] + i[1]]);
+		trim_by_char(&(ret[i[0]]), (char)i[2]);
+		ret[i[0]] = test_ech(ret[i[0]]);
+		while (ret[++(i[0])])
+		{
+			free(ret[i[0]]);
+			ret[i[0]] = ret[i[0] + i[1]];
+		}
+	}
+	else if (c_ret)
+		trim_by_char(&(ret[i[0]]), (char)i[2]);
+}
+
 char	**split_command(char *command)
 {
-	char	*c;
 	char	**ret;
-	int		i;
-	int		y;
+	int		i[3];
 	char	*c_ret;
-	int		r;
 
 	command = test_sh(command);
-	r = test_quote(command);
-	c = ft_strchr(command, r);
+	i[2] = test_quote(command);
 	ret = ft_split(command, ' ');
 	ret = test_space(ret);
-	if (c && ft_strchr(command, ' '))
+	if (ft_strchr(command, i[2]) && ft_strchr(command, ' '))
 	{
-		i = 0;
-		y = 0;
-		while (ret[i] && !c_ret)
+		i[0] = 0;
+		i[1] = 0;
+		while (ret[i[0]] && !c_ret)
 		{
-			c_ret = ft_strchr(ret[i], r);
-			if (c_ret 
-					&& (!ft_strchr(c_ret + 1, r) 
-					|| *(ft_strchr(c_ret + 1, r) - 1) == '\\'))
-			{
-				y++;
-				while (!ft_strchr(ret[i + y], r) 
-						|| *(ft_strchr(ret[i + y], r) - 1) == '\\')
-				{
-					c = ret[i];
-					ret[i] = ft_strjoin(ret[i], " ");
-					free(c);
-					c = ret[i];
-					ret[i] = ft_strjoin(ret[i], ret[i + y]);
-					free(c);
-					y++;
-				}
-				c = ret[i];
-				ret[i] = ft_strjoin(ret[i], " ");
-				free(c);
-				c = ret[i];
-				ret[i] = ft_strjoin(ret[i], ret[i + y]);
-				free(c);
-				c = ret[i];
-				if (r == 34)
-					ret[i] = ft_strtrim(ret[i], "\"");
-				else if (r == 39)
-					ret[i] = ft_strtrim(ret[i], "\'");
-				free(c);
-				ret[i] = test_ech(ret[i]);
-				while (ret[++i])
-					ret[i] = ret[i + y];
-			}
-			else if (c_ret)
-			{
-				ret[i] = ret[i] + 1;
-				ret[i][ft_strlen(ret[i]) - 1] = 0;
-			}
-			i++;
+			c_ret = ft_strchr(ret[i[0]], i[2]);
+			split_quote(i, ret, c_ret);
+			i[0]++;
 		}
 	}
 	return (ret);
@@ -92,38 +81,35 @@ int	close_all(int in, int out, int **pipes, int size)
 	return (1);
 }
 
+void	dup_in_out(int in, int out)
+{
+	if (dup2(in, STDIN_FILENO) == -1)
+		exit(0);
+	if (dup2(out, STDOUT_FILENO) == -1)
+		exit(0);
+}
+
 void	exec(char *command, char **envp, int *num, int **fd)
 {
 	char	*path;
 	char	**args;
-	char **test;
 
 	args = split_command(command);
-	test = args;
 	path = ft_path(args, envp);
 	if (num[0] == 1)
 	{
 		close_all(-1, num[3], fd, num[4]);
-		if (dup2(num[1], STDIN_FILENO) == -1)
-			exit(0);
-		if (dup2(fd[num[3]][1], STDOUT_FILENO) == -1)
-			exit(0);
+		dup_in_out(num[1], fd[num[3]][1]);
 	}
 	if (num[0] == 3)
 	{
 		close_all(num[3] - 1, -1, fd, num[4]);
-		if (dup2(fd[num[3] - 1][0], STDIN_FILENO) == -1)
-			exit(0);
-		if (dup2(num[2], STDOUT_FILENO) == -1)
-			exit(0);	
+		dup_in_out(fd[num[3] - 1][0], num[2]);
 	}
 	if (num[0] == 2)
 	{
 		close_all(num[3] - 1, num[3], fd, num[4]);
-		if (dup2(fd[num[3] - 1][0], STDIN_FILENO) == -1)
-			exit(0);
-		if (dup2(fd[num[3]][1], STDOUT_FILENO) == -1)
-			exit(0);
+		dup_in_out(fd[num[3] - 1][0], fd[num[3]][1]);
 	}
 	if (execve(path, args, envp) == -1)
 	{

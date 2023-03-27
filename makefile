@@ -1,4 +1,4 @@
-SRCS		= main.c path.c error.c here_doc.c test.c exec.c gnl/get_next_line.c gnl/get_next_line_utils.c
+SRCS		= main.c path.c error.c here_doc.c test.c exec.c utils.c gnl/get_next_line.c gnl/get_next_line_utils.c
 
 OBJS		= ${SRCS:.c=.o}
 
