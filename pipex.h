@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 11:30:47 by eberger           #+#    #+#             */
-/*   Updated: 2023/03/27 17:11:18 by eberger          ###   ########.fr       */
+/*   Updated: 2023/03/28 14:58:19 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ char	*test_command(char *command);
 
 int		command_not_found(char *command);
 int		permission_denied(char *command);
-int		close_all(int in, int out, int **pipes, int size);
+int		close_all(int **pipes, int *num);
 
 void	test(int argc, int *ret, char **argv);
 int		test_quote(char *command);

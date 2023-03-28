@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 10:55:25 by eberger           #+#    #+#             */
-/*   Updated: 2023/03/27 17:11:07 by eberger          ###   ########.fr       */
+/*   Updated: 2023/03/28 15:11:48 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,12 @@
 void	ft_number(int i, int ncmd, int *ret)
 {
 	ret[3] = i;
-	ret[4] = ncmd - 1;
 	if (i == 0 && i != ncmd)
 		ret[0] = 1;
 	else if (i != 0 && i == ncmd - 1)
 		ret[0] = 3;
 	else if (i > 0 && i < ncmd)
 		ret[0] = 2;
-	else
-		ret[0] = 4;
 }
 
 int	open_files(char *argv[], int argc, int *num)
@@ -110,7 +107,7 @@ int	main(int argc, char *argv[], char **envp)
 	test(argc, ret, argv);
 	pipes = create_pipes(argc, argv, ret);
 	pid = multi_fork(ret, envp, pipes, argv);
-	close_all(-1, -1, pipes, ret[5] - 1);
+	close_all(pipes, ret);
 	i[0] = 0;
 	while (i[0] < ret[5] - 1)
 	{

@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 16:31:38 by eberger           #+#    #+#             */
-/*   Updated: 2023/03/27 14:38:41 by eberger          ###   ########.fr       */
+/*   Updated: 2023/03/28 14:57:35 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,19 +65,19 @@ char	**split_command(char *command)
 	return (ret);
 }
 
-int	close_all(int in, int out, int **pipes, int size)
+int	close_all(int **pipes, int *num)
 {
 	int	i;
 
 	i = 0;
-	while (i < size)
+	while (i < num[5] - 1)
 	{
-		if (i != in)
-			close(pipes[i][0]);
-		if (i != out)
-			close(pipes[i][1]);
+		close(pipes[i][0]);
+		close(pipes[i][1]);
 		i++;
 	}
+	close(num[1]);
+	close(num[2]);
 	return (1);
 }
 
@@ -89,7 +89,7 @@ void	dup_in_out(int in, int out)
 		exit(0);
 }
 
-void	exec(char *command, char **envp, int *num, int **fd)
+void	exec(char *command, char **envp, int *num, int **pipes)
 {
 	char	*path;
 	char	**args;
@@ -98,18 +98,18 @@ void	exec(char *command, char **envp, int *num, int **fd)
 	path = ft_path(args, envp);
 	if (num[0] == 1)
 	{
-		close_all(-1, num[3], fd, num[4]);
-		dup_in_out(num[1], fd[num[3]][1]);
+		dup_in_out(num[1], pipes[num[3]][1]);
+		close_all(pipes, num);
 	}
 	if (num[0] == 3)
 	{
-		close_all(num[3] - 1, -1, fd, num[4]);
-		dup_in_out(fd[num[3] - 1][0], num[2]);
+		dup_in_out(pipes[num[3] - 1][0], num[2]);
+		close_all(pipes, num);
 	}
 	if (num[0] == 2)
 	{
-		close_all(num[3] - 1, num[3], fd, num[4]);
-		dup_in_out(fd[num[3] - 1][0], fd[num[3]][1]);
+		dup_in_out(pipes[num[3] - 1][0], pipes[num[3]][1]);
+		close_all(pipes, num);
 	}
 	if (execve(path, args, envp) == -1)
 	{
