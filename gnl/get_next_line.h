@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 14:58:39 by eberger           #+#    #+#             */
-/*   Updated: 2023/03/27 11:17:53 by eberger          ###   ########.fr       */
+/*   Updated: 2023/05/17 10:25:00 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #  define BUFFER_SIZE 1024
 # endif
 
-char	*ft_clear(char **str);
+char	*ft_clear_split(char **str);
 size_t	ft_strlcat(char *dest, const char *src, size_t size);
 void	*ft_calloc(size_t nmemb, size_t size);
 int		ft_linelen(char *s);

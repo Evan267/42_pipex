@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 15:09:02 by eberger           #+#    #+#             */
-/*   Updated: 2022/12/20 11:09:55 by eberger          ###   ########.fr       */
+/*   Updated: 2023/05/17 10:24:28 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,16 @@ char	*get_rest_buff(char *s, int ls)
 	{
 		c = (char *)ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 		if (!c)
-			return (ft_clear(&s));
+			return (ft_clear_split(&s));
 		ft_strlcat(c, s + ls, (BUFFER_SIZE - ls) + 1);
-		ft_clear(&s);
+		ft_clear_split(&s);
 		if (*c)
 			return (c);
 		else
-			return (ft_clear(&c));
+			return (ft_clear_split(&c));
 	}
 	else
-		return (ft_clear(&s));
+		return (ft_clear_split(&s));
 }
 
 char	*init_s(char *s, int *fd)
@@ -41,14 +41,14 @@ char	*init_s(char *s, int *fd)
 	char	*str;
 
 	if (*fd < 0 || BUFFER_SIZE <= 0 || read(*fd, 0, 0) < 0)
-		return (ft_clear(&s));
+		return (ft_clear_split(&s));
 	if (!s)
 	{
 		str = (char *)ft_calloc(sizeof(char), BUFFER_SIZE + 1);
 		if (!str)
 			return (NULL);
 		if (read(*fd, str, BUFFER_SIZE) <= 0)
-			return (ft_clear(&str));
+			return (ft_clear_split(&str));
 	}
 	else
 		str = s;
@@ -112,15 +112,15 @@ char	*get_next_line(int fd)
 	ls = ft_linelen(s);
 	str = next_str(fd, s, &ls, str);
 	if (!str)
-		return (ft_clear(&s));
+		return (ft_clear_split(&s));
 	while (ls == -1)
 	{
 		str = next_str(fd, s, &ls, str);
 		if (!str)
-			return (ft_clear(&s));
+			return (ft_clear_split(&s));
 	}
 	if (ls == -2 && *str == 0)
-		return (ft_clear(&str));
+		return (ft_clear_split(&str));
 	s = get_rest_buff(s, ls);
 	return (str);
 }

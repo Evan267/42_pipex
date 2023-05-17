@@ -6,7 +6,7 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 10:55:25 by eberger           #+#    #+#             */
-/*   Updated: 2023/05/17 10:47:16 by eberger          ###   ########.fr       */
+/*   Updated: 2023/03/28 15:11:48 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ int	**create_pipes(int argc, char **argv, int *num)
 		pipes[i] = malloc(sizeof(int) * 2);
 		i++;
 	}
+	if (num[5] == argc - 4)
+		num[1] = here_doc(argv[2]);
 	open_files(argv, argc, num);
 	i = 0;
 	while (i < num[5] - 1)

@@ -6,13 +6,13 @@
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/06 11:52:19 by eberger           #+#    #+#             */
-/*   Updated: 2022/12/20 09:35:43 by eberger          ###   ########.fr       */
+/*   Updated: 2023/05/17 10:23:51 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_clear(char **str)
+char	*ft_clear_split(char **str)
 {
 	if (str && *str)
 	{
@@ -90,7 +90,7 @@ void	*ft_realloc(void *ptr, size_t size, size_t msize)
 		return (ptr);
 	new = ft_calloc(1, size);
 	if (!new)
-		return (ft_clear(&str));
+		return (ft_clear_split(&str));
 	if (str)
 	{
 		while (str[i])

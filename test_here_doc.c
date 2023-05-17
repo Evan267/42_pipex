@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   test_here_doc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eberger <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 11:18:10 by eberger           #+#    #+#             */
-/*   Updated: 2023/05/17 10:55:31 by eberger          ###   ########.fr       */
+/*   Updated: 2023/05/17 10:55:03 by eberger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,11 +100,19 @@ char	*test_sh(char *command)
 void	test(int argc, int *ret, char **argv)
 {
 	ret[1] = -2;
-	if (argc != 5 && argv)
+	if (argc < 5)
 	{
-		ft_putendl_fd("Erreur : nombre d'arguments incorrect", 2);
+		ft_putendl_fd("Erreur : nombre d'arguments insuffisant", 2);
 		exit(127);
 	}
-	ret[5] = argc - 3;
-	ret[6] = 2;
+	if (!ft_strncmp(argv[1], "here_doc", ft_strlen(argv[1])))
+	{
+		ret[5] = argc - 4;
+		ret[6] = 3;
+	}
+	else
+	{
+		ret[5] = argc - 3;
+		ret[6] = 2;
+	}
 }
